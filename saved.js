@@ -43,6 +43,7 @@ function makingSavedNews(){
     save.append(container);
     if(savedNews.length===0){
       save.innerText="Nothing is saved😊"
+      save.style.textAlign="center";
     }
     refresh();
    // console.log(save);

@@ -1,5 +1,8 @@
+// import Img from './newsImage.webp';
 const url="https://inshorts.deta.dev/news?";
+const newUrlKey='60365b29851d46a58ec24f1c75e1f275';
 //URL OF THE API
+const Img='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTl0XGcgZivIDeGqLE0_ZSBARUIdHLJJ9NHQIYPy7zpUt1bbtU_5YpcZNHzinMXbtKVQMI&usqp=CAU';
 const select=document.querySelectorAll('.topics>span');
 //selecting all span element of topics
 const news=document.querySelectorAll('.news-detail>h6');//selecting all h6 elements under news-detals class element
@@ -13,7 +16,7 @@ select.forEach((span)=>{
       element.style.backgroundColor="#FF6969";
       element.style.fontWeight=400;
     });
-    atStart(span.textContent.toLowerCase());
+    getNews(span.textContent.toLowerCase());
 
     span.style.backgroundColor="#CD1818";
     span.style.fontWeight=500;
@@ -65,86 +68,91 @@ icon.forEach((ion)=>{
    }
    
    localStorage.setItem('savedNews',JSON.stringify(savedNews));
-  
-
   });
 });
 
 }
 
-//------------------------------------------------------------
-//----For the-Start of the Page-------------------------------------------------------------------------------------------------------------
-function atStart(newsItem){
-  // savedNews=[];
-  addNews.innerHTML='Loading....';
-  
-  fetch(`${url}category=${newsItem}`)
-  .then((response)=>response.json()).then((data)=>{
-    var mainDiv=document.createElement('div');
-     addNews.innerHTML='';
+const API_KEY = '60365b29851d46a58ec24f1c75e1f275';
+// const category=''
+const url2=`https://newsapi.org/v2/top-headlines?country=in&category=business&apiKey=${API_KEY}`
+
+ const getNews=async(category)=>{
+  try{
+    const response=await fetch(`https://newsapi.org/v2/top-headlines?country=in&category=${category}&apiKey=${API_KEY}`);
+    const obj=await response.json();
+    const data=obj.articles;
     
-    console.log(data);
-    //console.log(h6);
-    for(let x in data.data){
-      var content=document.createElement('div');
-      const h6=document.createElement('h6');
-      const anchor=document.createElement('a');
-      anchor.setAttribute("href",data.data[x].readMoreUrl);
-      const img=document.createElement('img');
-      img.className="image";
-      const url=data.data[x].imageUrl;
-      // console.log(url);
-      img.setAttribute("src",`${url}`);
-      // console.log(img.src);
-      anchor.append(img);
-
-    h6.innerText=`CATEGORY:${data.category.toUpperCase()}`;
-      content.classList.add("data");//class is given
-      var div=document.createElement('div');
-      div.classList.add("news-detail");
-      var h5=document.createElement('h5');
-      h5.innerText=`${data.data[x].author}`;
-      div.append(h5);
-      div.append(h6);
-      const para=document.createElement('p');
-      // console.log(h5,h6);
-      para.innerText=data.data[x].content;
-      //var node=document.createTextNode();
-      //console.log(div);
-      content.append(anchor);
-      content.append(div);
-      content.append(para);
-      content.setAttribute('id',data.data[x].id);
-     // var icon=document.createTextNode(`${<i class="fa-regular fa-heart"></i>}`);
-      const icon=document.createElement('i');
-      icon.className="fa-regular fa-heart";
-      const savedNews=JSON.parse(localStorage.getItem('savedNews'))||[];
-     
-     
-      savedNews.forEach((element)=>{
-        //console.log(element.id,data.data[x].id);
-        if(element.content===data.data[x].content){
-          icon.className="fa-solid fa-heart";
-        }
-      })
+      var mainDiv=document.createElement('div');
+       addNews.innerHTML='';
       
-      content.append(icon);
-      mainDiv.append(content);
-      // savedNews.splice(0,4);
-      // savedNews.splice(0,100);
-    }
-    mainDiv.classList.add("news-container");
-    // const addNews=document.getElementById("add-news");
+      console.log(data);
+      //console.log(h6);
+      for(let x in data){
+        var content=document.createElement('div');
+        const h6=document.createElement('h6');
+        const anchor=document.createElement('a');
+        anchor.setAttribute("href",data[x].url);
+        const img=document.createElement('img');
+        img.className="image";
+        const url=data[x].urlToImage||Img;
+        // console.log(url);
+        // console.log(url);
+        img.setAttribute("src",`${url}`);
+        // console.log(img.src);
+        anchor.append(img);
+  
+      h6.innerText=`CATEGORY:${category.toUpperCase()}`;
+        content.classList.add("data");//class is given
+        var div=document.createElement('div');
+        div.classList.add("news-detail");
+        var h5=document.createElement('h5');
+        h5.innerText=`${data[x].author}`;
+        div.append(h5);
+        div.append(h6);
+        const para=document.createElement('p');
+        // console.log(h5,h6);
+        para.innerText=data[x].content;
+        //var node=document.createTextNode();
+        //console.log(div);
+        content.append(anchor);
+        content.append(div);
+        content.append(para);
+        content.setAttribute('id',data[x].publishedAt);
+       // var icon=document.createTextNode(`${<i class="fa-regular fa-heart"></i>}`);
+        const icon=document.createElement('i');
+        icon.className="fa-regular fa-heart";
+        const savedNews=JSON.parse(localStorage.getItem('savedNews'))||[];
+       
+       
+        savedNews.forEach((element)=>{
+          //console.log(element.id,data.data[x].id);
+          if(element.id===data[x].id){
+            icon.className="fa-solid fa-heart";
+          }
+        })
+        
+        content.append(icon);
+        mainDiv.append(content);
+        // savedNews.splice(0,4);
+        // savedNews.splice(0,100);
+      }
+      mainDiv.classList.add("news-container");
+      // const addNews=document.getElementById("add-news");
+  
+  // savedNews=[];
+      addNews.append(mainDiv);
+  
+  
+      refresh();
+     
+  
+    
 
-// savedNews=[];
-    addNews.append(mainDiv);
-
-
-    refresh();
-   
-
-  });
- 
+  }
+  catch(error){
+    console.log(error);
+  }
 }
- atStart('all');
 
+getNews('general');
